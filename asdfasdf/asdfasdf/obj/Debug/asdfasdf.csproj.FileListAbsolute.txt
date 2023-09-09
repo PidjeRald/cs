@@ -1,0 +1,11 @@
+C:\Users\asdf\source\repos\asdfasdf\asdfasdf\bin\Debug\asdfasdf.exe.config
+C:\Users\asdf\source\repos\asdfasdf\asdfasdf\bin\Debug\asdfasdf.exe
+C:\Users\asdf\source\repos\asdfasdf\asdfasdf\bin\Debug\asdfasdf.pdb
+C:\Users\asdf\source\repos\asdfasdf\asdfasdf\obj\Debug\asdfasdf.csproj.AssemblyReference.cache
+C:\Users\asdf\source\repos\asdfasdf\asdfasdf\obj\Debug\asdfasdf.Form1.resources
+C:\Users\asdf\source\repos\asdfasdf\asdfasdf\obj\Debug\asdfasdf.Form2.resources
+C:\Users\asdf\source\repos\asdfasdf\asdfasdf\obj\Debug\asdfasdf.Properties.Resources.resources
+C:\Users\asdf\source\repos\asdfasdf\asdfasdf\obj\Debug\asdfasdf.csproj.GenerateResource.cache
+C:\Users\asdf\source\repos\asdfasdf\asdfasdf\obj\Debug\asdfasdf.csproj.CoreCompileInputs.cache
+C:\Users\asdf\source\repos\asdfasdf\asdfasdf\obj\Debug\asdfasdf.exe
+C:\Users\asdf\source\repos\asdfasdf\asdfasdf\obj\Debug\asdfasdf.pdb
