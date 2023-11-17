@@ -1,31 +1,99 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.7.34024.191
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lab3testtesttest", "lab3testtesttest\lab3testtesttest.csproj", "{D4F83CDD-393B-42FD-82D1-C5A12A0DF062}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{4A386B25-87F7-4156-83F5-EAFE311DDB34}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D4F83CDD-393B-42FD-82D1-C5A12A0DF062}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D4F83CDD-393B-42FD-82D1-C5A12A0DF062}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D4F83CDD-393B-42FD-82D1-C5A12A0DF062}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D4F83CDD-393B-42FD-82D1-C5A12A0DF062}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4A386B25-87F7-4156-83F5-EAFE311DDB34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4A386B25-87F7-4156-83F5-EAFE311DDB34}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4A386B25-87F7-4156-83F5-EAFE311DDB34}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4A386B25-87F7-4156-83F5-EAFE311DDB34}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {0309E23F-6B2A-4E24-B368-FF74238F6336}
-	EndGlobalSection
-EndGlobal
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml.Serialization;
+using ClassLibrary1;
+
+namespace lab3
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            LinkedStack<int> linkedStack = new LinkedStack<int>();
+            linkedStack.Push(1);
+            linkedStack.Push(2);
+            linkedStack.Push(3);
+            linkedStack.Push(4);
+            linkedStack.Push(5);
+
+            bool exists = StackUtils.Exists(linkedStack, value => value == 2);
+            exists = StackUtils.Exists(linkedStack, value => value == -2);
+
+            IStack<int> foundStack = StackUtils.FindAll(linkedStack, value => value % 2 == 0, () => new ArrayStack<int>(3));
+            int value1 = foundStack.Peek();
+
+            IStack<string> convertedStack = StackUtils.ConvertAll(foundStack, value => value.ToString(), () => new LinkedStack<string>());
+            string value2 = convertedStack.Pop();
+            string value3 = convertedStack.Pop();
+
+            UnmutableStack<int> unmutableStack = new UnmutableStack<int>(linkedStack);
+
+            StackUtils.ForEach(unmutableStack, value => Console.WriteLine(value));
+
+
+            bool checkForAll = StackUtils.CheckForAll(unmutableStack, value => value > 0);
+
+            //ArrayStack<int> asdf = new ArrayStack<int>(4);
+            //asdf.Push(1);
+            //asdf.Push(2);
+            //asdf.Push(3);
+            //asdf.Push(4);
+            //Console.WriteLine(asdf.Pop());
+            //Console.WriteLine(asdf.Pop());
+            //asdf.Clear();
+            //LinkedStack<int> s = new LinkedStack<int>();
+            //s.Push(1);
+            //s.Push(2);
+            //s.Push(3);
+            //s.Push(4);
+            //s.Clear();
+            //Console.WriteLine(s.Count());
+            //UnmutableStack<int> unmutablestack = new UnmutableStack<int>(s);
+            //unmutablestack.Peek();
+            //IStack<int> result1 = StackUtils.FindAll(s, x => x % 2 == 0, () => new ArrayStack<int>(2));
+            //foreach (int v in result1) 
+            //{
+            //    Console.WriteLine(v);
+            //}
+            //bool exists = StackUtils.Exists(s, x => x == 2);
+            //Console.WriteLine(exists);
+            //IStack<string> result2 = StackUtils.ConvertAll(s, x => x.ToString(), () => new ArrayStack<string>(s.Count));
+            //StackUtils.ForEach(s, x => Console.WriteLine(x));
+            //StackUtils.CheckForAll(s, x => x % 2 == 0);
+
+            //StackConstructorDelegate<int> arrayStackConstructor = () => new ArrayStack<int>(10);
+            //StackConstructorDelegate<int> linkedStackConstructor = () => new LinkedStack<int>();
+
+            //IStack<int> arrayStack = arrayStackConstructor.Invoke();
+            //IStack<int> linkedStack = linkedStackConstructor.Invoke();
+
+            //// Добавляем элементы в стеки
+            //arrayStack.Push(1);
+            //arrayStack.Push(2);
+            //arrayStack.Push(3);
+
+            //linkedStack.Push(4);
+            //linkedStack.Push(5);
+            //linkedStack.Push(6);
+
+            //// Выводим элементы стеков
+            //Console.WriteLine("Array Stack:");
+            //foreach (int item in arrayStack)
+            //{
+            //    Console.WriteLine(item);
+            //}
+
+            //Console.WriteLine("Linked Stack:");
+            //foreach (int item in linkedStack)
+            //{
+            //    Console.WriteLine(item);
+            //}
+
+        }
+    }
+}
