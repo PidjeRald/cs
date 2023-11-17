@@ -1,117 +1,291 @@
-https://sun9-10.userapi.com/impg/cEA-12FZATP13eqBptYp2ot_mfRG-Pso41lp6g/ZfT0s7ZEtrE.jpg?size=852x823&quality=96&sign=6291ba6f9b31952045bf333a25f31229&type=album
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Collections.Specialized;
-using System.Drawing;
+using System.Collections;
+using NPOI.SS.Formula.Functions;
 
-class ImageProcessor
+namespace ClassLibrary1
 {
-    private Bitmap image;
-
-    public ImageProcessor(string imagePath)
+    public interface IStack<T> : IEnumerable<T>
     {
-        image = new Bitmap(imagePath);
+        void Push(T value);
+        void Clear();
+        T Pop();
+        T Peek();
+        int Count { get; }
+        bool isEmpty { get; }
     }
 
-    public void SaveImage(string outputPath)
+    public class StackException : Exception
     {
-        image.Save(outputPath);
+        public StackException(string message) : base(message) { }
     }
 
-    private int[] GetHistogram(Bitmap image)
+    public class ArrayStack<T> : IStack<T>
     {
-        int[] histogram = new int[256];
-        for (int y = 0; y < image.Height; y++)
+        private T[] items;
+        private int top;
+
+        public ArrayStack(int count)
         {
-            for (int x = 0; x < image.Width; x++)
+            items = new T[count];
+            top = -1;
+        }
+
+        public void Push(T value)
+        {
+            if (top == items.Length - 1)
             {
-                Color pixel = image.GetPixel(x, y);
-                int intensity = (int)(0.299 * pixel.R + 0.587 * pixel.G + 0.114 * pixel.B);
-                histogram[intensity]++;
+                throw new StackException("Stack is full");
+            }
+            items[++top] = value;
+        }
+
+        public void Clear()
+        {
+            Array.Clear(items, 0, top + 1);
+            top = -1;
+        }
+
+        public T Pop()
+        {
+            if (top == -1)
+            {
+                throw new StackException("Stack is empty");
+            }
+            T value = items[top];
+            Array.Clear(items, top--, 1);
+            return value;
+        }
+
+        public T Peek()
+        {
+            if (top == -1)
+            {
+                throw new StackException("Stack is empty");
+            }
+            return items[top];
+        }
+
+        public int Count
+        {
+            get { return top + 1; }
+        }
+
+        public bool isEmpty
+        {
+            get { return top == -1; }
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            for (int i = top; i >= 0; i--)
+            {
+                yield return items[i];
             }
         }
-        return histogram;
-    }
 
-    private int[] GetCumulativeHistogram(int[] histogram)
-    {
-        int[] cumulativeHistogram = new int[256];
-        cumulativeHistogram[0] = histogram[0];
-        for (int i = 1; i < 256; i++)
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            cumulativeHistogram[i] = cumulativeHistogram[i - 1] + histogram[i];
+            return GetEnumerator();
         }
-        return cumulativeHistogram;
     }
 
-    public void HistogramEqualization()
+    public class LinkedStack<T> : IStack<T>
     {
-        int[] histogram = GetHistogram(image);
-        int[] cumulativeHistogram = GetCumulativeHistogram(histogram);
-        for (int y = 0; y < image.Height; y++)
+        private class Node
         {
-            for (int x = 0; x < image.Width; x++)
+            public T Value { get; set; }
+            public Node Next { get; set; }
+        }
+
+        private Node top;
+
+        public LinkedStack() { top = null; }
+
+        public void Push(T value)
+        {
+            Node newNode = new Node { Value = value, Next = top };
+            top = newNode;
+        }
+
+        public void Clear()
+        {
+            top = null;
+        }
+
+        public T Pop()
+        {
+            if (top == null)
             {
-                Color pixel = image.GetPixel(x, y);
-                int intensity = (int)(0.299 * pixel.R + 0.587 * pixel.G + 0.114 * pixel.B);
-                int newIntensity = cumulativeHistogram[intensity] * 255 / (image.Width * image.Height);
-                Color newPixel = Color.FromArgb(newIntensity, newIntensity, newIntensity);
-                image.SetPixel(x, y, newPixel);
+                throw new StackException("Stack is empty");
             }
+            T value = top.Value;
+            top = top.Next;
+            return value;
         }
-    }
 
-    public void HistogramStretching()
-    {
-        int minIntensity = 255;
-        int maxIntensity = 0;
-        for (int y = 0; y < image.Height; y++)
+        public T Peek()
         {
-            for (int x = 0; x < image.Width; x++)
+            if (top == null)
             {
-                Color pixel = image.GetPixel(x, y);
-                int intensity = (int)(0.299 * pixel.R + 0.587 * pixel.G + 0.114 * pixel.B);
-                if (intensity < minIntensity)
+                throw new StackException("Stack is empty");
+            }
+            return top.Value;
+        }
+
+        public int Count
+        {
+            get
+            {
+                int count = 0;
+                Node current = top;
+                while (current != null)
                 {
-                    minIntensity = intensity;
+                    count++;
+                    current = current.Next;
                 }
-                if (intensity > maxIntensity)
-                {
-                    maxIntensity = intensity;
-                }
+                return count;
             }
         }
-        for (int y = 0; y < image.Height; y++)
+
+        public bool isEmpty
         {
-            for (int x = 0; x < image.Width; x++)
+            get { return top == null; }
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            Node current = top;
+            while (current != null)
             {
-                Color pixel = image.GetPixel(x, y);
-                int intensity = (int)(0.299 * pixel.R + 0.587 * pixel.G + 0.114 * pixel.B);
-                int newIntensity = (int)((intensity - minIntensity) * 255.0 / (maxIntensity - minIntensity));
-                Color newPixel = Color.FromArgb(newIntensity, newIntensity, newIntensity);
-                image.SetPixel(x, y, newPixel);
+                yield return current.Value;
+                current = current.Next;
             }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
-}
 
-class Program
-{
-    static void Main()
+    public class UnmutableStack<T> : IStack<T>
     {
-        string imagePath = "C:\\Users\\asdf\\Desktop\\1.png";
-        string outputImagePath1 = "C:\\Users\\asdf\\Desktop\\2.png";
-        string outputImagePath2 = "C:\\Users\\asdf\\Desktop\\3.png";
+        private readonly IStack<T> stack;
 
-        ImageProcessor image1 = new ImageProcessor(imagePath);
-        image1.HistogramEqualization();
-        image1.SaveImage(outputImagePath1);
+        public UnmutableStack(IStack<T> stack)
+        {
+            this.stack = stack;
+        }
 
-        ImageProcessor image2 = new ImageProcessor(imagePath);
-        image2.HistogramStretching();
-        image2.SaveImage(outputImagePath2);
+        public void Push(T value)
+        {
+            throw new StackException("Cannot push to unmutable stack");
+        }
+
+        public void Clear()
+        {
+            throw new StackException("Cannot clear unmutable stack");
+        }
+
+        public T Pop()
+        {
+            throw new StackException("Cannot pop from unmutable stack");
+        }
+
+        public T Peek()
+        {
+            return stack.Peek();
+        }
+
+        public int Count
+        {
+            get { return stack.Count; }
+        }
+
+        public bool isEmpty
+        {
+            get { return stack.isEmpty; }
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return stack.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+
+
+    public static class StackUtils
+    {
+        public delegate bool CheckDelegate<T>(T value);
+        public delegate IStack<T> StackConstructorDelegate<T>();
+        public delegate TO ConvertDelegate<TI, TO>(TI value);
+        public delegate void ActionDelegate<T>(T value);
+
+        public static bool Exists<T>(IStack<T> stack, CheckDelegate<T> checkDelegate)
+        {
+            foreach (T value in stack)
+            {
+                if (checkDelegate(value))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static IStack<T> FindAll<T>(IStack<T> stack, CheckDelegate<T> checkDelegate, StackConstructorDelegate<T> constructorDelegate)
+        {
+            IStack<T> result = constructorDelegate();
+            foreach (T value in stack)
+            {
+                if (checkDelegate(value))
+                {
+                    result.Push(value);
+                }
+            }
+            return result;
+        }
+
+        public static IStack<TO> ConvertAll<TI, TO>(IStack<TI> stack, ConvertDelegate<TI, TO> convertDelegate, StackConstructorDelegate<TO> constructorDelegate)
+        {
+            IStack<TO> result = constructorDelegate();
+            foreach (TI value in stack)
+            {
+                result.Push(convertDelegate(value));
+            }
+            return result;
+        }
+
+        public static void ForEach<T>(IStack<T> stack, ActionDelegate<T> actionDelegate)
+        {
+            foreach (T value in stack)
+            {
+                actionDelegate(value);
+            }
+        }
+
+        public static bool CheckForAll<T>(IStack<T> stack, CheckDelegate<T> checkDelegate)
+        {
+            foreach (T value in stack)
+            {
+                if (!checkDelegate(value))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public static readonly StackConstructorDelegate<T> ArrayStackConstructor = () => new ArrayStack<T>(1);
+        public static readonly StackConstructorDelegate<T> LinkedStackConstructor = () => new LinkedStack<T>();
     }
 }
