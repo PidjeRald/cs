@@ -10,10 +10,52 @@ using ClassLibrary1;
 
 namespace lab3
 {
+    class Rectangle : IComparable<Rectangle>
+    {
+        public double Length;
+        public double Width;
+
+        public Rectangle(double Length, double Width)
+        {
+            this.Length = Length;
+            this.Width = Width;
+        }
+
+        public int CompareTo(Rectangle other)
+        {
+            return (this.Length * this.Width).CompareTo(other.Length * other.Width);
+        }
+    }
     internal class Program
     {
         static void Main(string[] args)
         {
+            ArrayStack<Rectangle> stack1 = new ArrayStack<Rectangle>(5);
+            stack1.Push(new Rectangle(3, 4));
+            stack1.Push(new Rectangle(2, 6));
+            stack1.Push(new Rectangle(5, 2));
+            stack1.Push(new Rectangle(7, 5));
+            stack1.Push(new Rectangle(1, 4));
+
+            bool exists1 = StackUtils.Exists(stack1, rect => rect.CompareTo(new Rectangle(6, 2)) == 0);
+            bool exists2 = StackUtils.Exists(stack1, rect => rect.CompareTo(new Rectangle(1, 2)) == 0);
+
+            IStack<Rectangle> foundStack1 = StackUtils.FindAll(stack1, rect => rect.CompareTo(new Rectangle(1, 11)) > 0, () => new ArrayStack<Rectangle>(3));
+
+
+            IStack<double> convertedStack1 = StackUtils.ConvertAll(stack1, rect => rect.Length, () => new LinkedStack<double>());
+
+            StackUtils.ForEach(stack1, rect => Console.WriteLine("Width: {0}, Height: {1} ", rect.Length, rect.Width));
+
+            bool checkForAll1 = StackUtils.CheckForAll(stack1, rect => rect.CompareTo(new Rectangle(10, 10)) < 0);
+            bool checkForAll2 = StackUtils.CheckForAll(stack1, rect => rect.CompareTo(new Rectangle(10, 1)) > 0);
+
+
+
+
+
+
+
             LinkedStack<int> linkedStack = new LinkedStack<int>();
             linkedStack.Push(1);
             linkedStack.Push(2);
@@ -37,63 +79,6 @@ namespace lab3
 
 
             bool checkForAll = StackUtils.CheckForAll(unmutableStack, value => value > 0);
-
-            //ArrayStack<int> asdf = new ArrayStack<int>(4);
-            //asdf.Push(1);
-            //asdf.Push(2);
-            //asdf.Push(3);
-            //asdf.Push(4);
-            //Console.WriteLine(asdf.Pop());
-            //Console.WriteLine(asdf.Pop());
-            //asdf.Clear();
-            //LinkedStack<int> s = new LinkedStack<int>();
-            //s.Push(1);
-            //s.Push(2);
-            //s.Push(3);
-            //s.Push(4);
-            //s.Clear();
-            //Console.WriteLine(s.Count());
-            //UnmutableStack<int> unmutablestack = new UnmutableStack<int>(s);
-            //unmutablestack.Peek();
-            //IStack<int> result1 = StackUtils.FindAll(s, x => x % 2 == 0, () => new ArrayStack<int>(2));
-            //foreach (int v in result1) 
-            //{
-            //    Console.WriteLine(v);
-            //}
-            //bool exists = StackUtils.Exists(s, x => x == 2);
-            //Console.WriteLine(exists);
-            //IStack<string> result2 = StackUtils.ConvertAll(s, x => x.ToString(), () => new ArrayStack<string>(s.Count));
-            //StackUtils.ForEach(s, x => Console.WriteLine(x));
-            //StackUtils.CheckForAll(s, x => x % 2 == 0);
-
-            //StackConstructorDelegate<int> arrayStackConstructor = () => new ArrayStack<int>(10);
-            //StackConstructorDelegate<int> linkedStackConstructor = () => new LinkedStack<int>();
-
-            //IStack<int> arrayStack = arrayStackConstructor.Invoke();
-            //IStack<int> linkedStack = linkedStackConstructor.Invoke();
-
-            //// Добавляем элементы в стеки
-            //arrayStack.Push(1);
-            //arrayStack.Push(2);
-            //arrayStack.Push(3);
-
-            //linkedStack.Push(4);
-            //linkedStack.Push(5);
-            //linkedStack.Push(6);
-
-            //// Выводим элементы стеков
-            //Console.WriteLine("Array Stack:");
-            //foreach (int item in arrayStack)
-            //{
-            //    Console.WriteLine(item);
-            //}
-
-            //Console.WriteLine("Linked Stack:");
-            //foreach (int item in linkedStack)
-            //{
-            //    Console.WriteLine(item);
-            //}
-
         }
     }
 }
